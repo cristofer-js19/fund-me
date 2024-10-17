@@ -5,6 +5,8 @@ import { expect } from "chai"
 async function deployFundMeFixture() {
     const decimals = 18;
     const ethToUsd = 2603;
+    const fiveUsdInEth = ethers.parseEther('0.0019');
+    const fourUsdInEth = ethers.parseEther('0.0015');
     const initialAnswer = ethToUsd * 10 ** 8;
 
     const MockV3AggregatorTest = await ethers.getContractFactory('MockV3AggregatorTest')
