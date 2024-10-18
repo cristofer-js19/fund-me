@@ -19,7 +19,6 @@ contract FundMe is Ownable {
     uint256 public constant MINIMAL_VALUE_USD = 5 * 10 ** 18;
     address[] private funders;
     mapping(address => uint256) private amountFundedPerAddress;
-    uint256 internal totalAmount;
 
     event Funde(
         address indexed from,
@@ -41,7 +40,6 @@ contract FundMe is Ownable {
         );
 
         amountFundedPerAddress[_msgSender()] += msg.value;
-        totalAmount += msg.value;
         funders.push(_msgSender());
         address beneficiary = owner();
 
@@ -55,7 +53,6 @@ contract FundMe is Ownable {
         }
 
         funders = new address[](0);
-        totalAmount = 0;
 
         (bool success, ) = owner().call{value: address(this).balance}("");
         if (!success) {
@@ -84,9 +81,5 @@ contract FundMe is Ownable {
 
     function getPriceFeed() external view returns (AggregatorV3Interface) {
         return dataFeed;
-    }
-
-    function getTotalAmount() external view returns (uint256) {
-        return totalAmount;
     }
 }
