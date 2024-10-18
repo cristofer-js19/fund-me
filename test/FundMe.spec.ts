@@ -78,7 +78,7 @@ describe("FundMe", () => {
                 .withArgs(funder1.address)
         });
 
-        it.only("Deve permitir retirada correta dos fundos", async function () {
+        it("Deve permitir retirada correta dos fundos", async function () {
             const { fundMe, funder1, owner } = await loadFixture(deployFundMeFixture);
 
             await fundMe.connect(funder1).fund({ value: ethers.parseEther("1") })
@@ -133,7 +133,7 @@ describe("FundMe", () => {
     /**
      * The student must implement - remove skip to implement unit tests
      */
-    describe("getFunder", function () {
+    describe.skip("getFunder", function () {
         it("Deve retornar o financiador correto", async function () {
             const { fundMe, funder1 } = await loadFixture(deployFundMeFixture);
             expect.fail("It will be implemented in the class")
