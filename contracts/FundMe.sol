@@ -9,6 +9,7 @@ import "hardhat/console.sol";
 
 error EtherNotEnough();
 error TransferFailure();
+error InvalidDateForFunding();
 
 contract FundMe is Ownable {
     // Using libary in type variable
@@ -17,6 +18,7 @@ contract FundMe is Ownable {
     // State Variables
     AggregatorV3Interface internal dataFeed;
     uint256 public constant MINIMAL_VALUE_USD = 5 * 10 ** 18;
+    uint256 public deadline;
     address[] private funders;
     mapping(address => uint256) private amountFundedPerAddress;
 
@@ -26,8 +28,9 @@ contract FundMe is Ownable {
         uint256 value
     );
 
-    constructor(AggregatorV3Interface _dataFeed) Ownable(_msgSender()) {
+    constructor(AggregatorV3Interface _dataFeed, uint256 _contractValidityInDays) Ownable(_msgSender()) {
         dataFeed = _dataFeed;
+        deadline = block.timestamp + (_contractValidityInDays * 1 days);
         // We can use console log in Solidity
         console.log("msg sender => ", _msgSender());
     }
@@ -38,6 +41,7 @@ contract FundMe is Ownable {
                 MINIMAL_VALUE_USD,
             EtherNotEnough()
         );
+        require(block.timestamp <= deadline, InvalidDateForFunding());
 
         amountFundedPerAddress[_msgSender()] += msg.value;
         funders.push(_msgSender());
@@ -63,7 +67,12 @@ contract FundMe is Ownable {
     /**
      * Do it yourself
      */
-    function cheaperWithdraw() external onlyOwner {}
+    function cheaperWithdraw() external onlyOwner {
+        delete funders;
+        
+        (bool success, ) = owner().call{value: address(this).balance}("");
+        require(success, TransferFailure());
+    }
 
     function getAmountFundedPerAddress(
         address funderAddress
